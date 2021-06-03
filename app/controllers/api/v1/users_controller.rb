@@ -6,8 +6,8 @@ module Api
 
       # GET /users
       def index
-        # render json: User.all
-        render json: UserSerializer.new(User.all).serializable_hash.to_json
+        @users = User.all
+        render json: UserSerializer.new(@users).serializable_hash.to_json
       end
 
       # GET /users/1
