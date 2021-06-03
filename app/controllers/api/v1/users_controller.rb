@@ -12,7 +12,8 @@ module Api
 
       # GET /users/1
       def show
-        render json: UserSerializer.new(@user).serializable_hash.to_json
+        options = { include: [:products] }
+        render json: UserSerializer.new(@user, options).serializable_hash.to_json
       end
 
       # POST /users
