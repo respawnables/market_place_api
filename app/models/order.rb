@@ -1,4 +1,6 @@
 class Order < ApplicationRecord
+  include ActiveModel::Validations
+
   before_validation :set_total!
 
   has_many :placements, dependent: :destroy
@@ -6,7 +8,10 @@ class Order < ApplicationRecord
 
   belongs_to :user
 
+  validates_with EnoughProductsValidator
+
   validates :total, presence: true, numericality: { greater_than_or_equal_to: 0 }
+
 
   def set_total!
     self.total = products.sum :price
