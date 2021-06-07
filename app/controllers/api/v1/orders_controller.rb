@@ -1,10 +1,21 @@
 module Api
   module V1
     class OrdersController < ApplicationController
+      include Paginable
+
       before_action :check_login, only: %i[index show create]
 
       def index
-        render json: OrderSerializer.new(current_user.orders).serializable_hash.to_json
+        @orders = current_user.orders.page(current_page).per(per_page)
+        options = {
+          links: {
+            first: api_v1_orders_path(page: 1),
+            last: api_v1_orders_path(page: @orders.total_pages),
+            prev: api_v1_orders_path(page: @orders.prev_page),
+            next: api_v1_orders_path(page: @orders.next_page)
+          }
+        }
+        render json: OrderSerializer.new(@orders, options).serializable_hash.to_json
       end
 
       def show
@@ -33,7 +44,7 @@ module Api
       private
 
       def order_params
-        params.require(:order).permit(product_ids_and_quantities: [:product_id, :quantity])
+        params.require(:order).permit(product_ids_and_quantities: %i[product_id quantity])
       end
     end
   end
